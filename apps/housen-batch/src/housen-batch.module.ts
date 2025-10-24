@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { HousenAppController } from './housen-batch.controller';
-import { HousenAppService } from './housen-batch.service';
+import { HousenBatchController } from './housen-batch.controller';
+import { HousenBatchService } from './housen-batch.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [],
-  controllers: [HousenAppController],
-  providers: [HousenAppService],
+  imports: [ConfigModule.forRoot()],
+  controllers: [HousenBatchController],
+  providers: [HousenBatchService],
 })
-export class HousenAppModule {}
+export class HousenBatchModule {}

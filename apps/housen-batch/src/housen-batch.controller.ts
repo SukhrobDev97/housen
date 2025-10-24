@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
-import { HousenAppService } from './housen-batch.service';
+import { HousenBatchService } from './housen-batch.service';
 
 @Controller()
-export class HousenAppController {
-  constructor(private readonly housenAppService: HousenAppService) {}
+export class HousenBatchController {
+  constructor(private readonly housenBatchService: HousenBatchService) {}
 
   @Get()
   getHello(): string {
-    return this.housenAppService.getHello();
+    return this.housenBatchService.getHello();
   }
 }

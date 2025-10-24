@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { HousenAppModule } from './housen-batch.module';
+import { HousenBatchModule } from './housen-batch.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(HousenAppModule);
-  await app.listen(process.env.port ?? 3000);
+  const app = await NestFactory.create(HousenBatchModule);
+  await app.listen(process.env.PORT_BATCH ?? 3000);
 }
 bootstrap();
