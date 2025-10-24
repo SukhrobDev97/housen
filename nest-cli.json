@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/housen-api/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/housen-api/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/housen-api",
+  "projects": {
+    "housen-api": {
+      "type": "application",
+      "root": "apps/housen-api",
+      "entryFile": "main",
+      "sourceRoot": "apps/housen-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/housen-api/tsconfig.app.json"
+      }
+    },
+    "housen-batch": {
+      "type": "application",
+      "root": "apps/housen-batch",
+      "entryFile": "main",
+      "sourceRoot": "apps/housen-batch/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/housen-batch/tsconfig.app.json"
+      }
+    }
   }
 }
