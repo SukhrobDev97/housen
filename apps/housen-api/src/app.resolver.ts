@@ -4,6 +4,6 @@ import { Query, Resolver } from "@nestjs/graphql";
 export class AppResolver{
     @Query(() => String)
     public sayHello (): string {
-        return "GraphQL apio"
+        return "GraphQL api"
     } 
 }
