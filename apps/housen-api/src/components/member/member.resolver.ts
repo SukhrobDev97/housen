@@ -9,6 +9,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { MemberType } from '../../libs/enums/member.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
+import { shapeItIntoMongoObjectId } from '../../libs/config';
 
 @Resolver()
 export class MemberResolver {
@@ -19,7 +20,7 @@ export class MemberResolver {
    
     console.log('Mutation: signup');
    
-    return this.memberService.signup(input);
+    return await this.memberService.signup(input);
    
   }
   
@@ -27,7 +28,7 @@ export class MemberResolver {
   public async login(@Args('input') input: LoginInput): Promise<Member> {    
     
         console.log('Mutation: login');
-        return this.memberService.login(input);
+        return await this.memberService.login(input);
       
   }
   
@@ -39,7 +40,7 @@ export class MemberResolver {
   ): Promise<Member> {
     console.log('Mutation: updateMember');
     delete input._id;
-    return this.memberService.updateMember(memberId, input);
+    return await this.memberService.updateMember(memberId, input);
   }
 
 
@@ -61,10 +62,11 @@ export class MemberResolver {
   }
 
 
-  @Query(() => String)
-  public async getMember(): Promise<string> {
+  @Query(() => Member)
+  public async getMember(@Args("memberId") input: string): Promise<Member> {
     console.log('Query: getMember');
-    return this.memberService.getMember();
+    const targetId = shapeItIntoMongoObjectId(input)
+    return await this.memberService.getMember(targetId);
   }
 
   //Admin only;
@@ -73,14 +75,14 @@ export class MemberResolver {
   @Mutation(() => String)
   public async getAllMembersByAdmin(): Promise<string> {
     console.log('Mutation: getAllMembersByAdmin ');
-    return this.memberService.getAllMembersByAdmin();
+    return await this.memberService.getAllMembersByAdmin();
   }
 
   //Authorized Admin;
   @Mutation(() => String)
   public async updateMemberByAdmin(): Promise<string> {
     console.log('Mutation: updateMemberByAdmin ');
-    return this.memberService.updateMemberByAdmin();
+    return await this.memberService.updateMemberByAdmin();
   }
 
   }
