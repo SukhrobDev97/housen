@@ -17,7 +17,6 @@ export class LoggingInterceptor implements NestInterceptor {
       }else if(requestType === "graphql") {
           /* (1) PRINT REQUEST */
           const gqlContext = GqlExecutionContext.create(context);
-          console.log("gqlContext =>", gqlContext.getContext().req.body)
           this.logger.log(`${this.stringify(gqlContext.getContext().req.body)}`, "REQUEST")
   
           /* (2) IF ERROR, HANDLES WITH GRAPHQL*/
