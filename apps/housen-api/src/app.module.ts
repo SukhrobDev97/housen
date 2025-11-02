@@ -20,7 +20,7 @@ import { T } from './libs/types/common';
       formatError: (error : T) => {
         console.log("Error:", error)
         const graphQlFormattedAError = {
-          code: "Error code",
+          code: error?.extensions.code,
           message: error?.extensions?.exception?.response?.message || error?.extensions?.response?.message || error?.message
         }
         console.log("GraphQl Global Error:", graphQlFormattedAError)
