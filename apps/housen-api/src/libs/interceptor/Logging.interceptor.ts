@@ -12,7 +12,7 @@ export class LoggingInterceptor implements NestInterceptor {
       this.logger.log(`Type ${requestType}`, "REQUEST")
   
       if(requestType === "http"){
-          //DEVELOP IF NEEDED;
+        return next.handle()
           console.log("HTTP request")
       }else if(requestType === "graphql") {
           /* (1) PRINT REQUEST */
