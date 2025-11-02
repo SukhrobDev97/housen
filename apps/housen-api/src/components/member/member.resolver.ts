@@ -24,15 +24,32 @@ export class MemberResolver {
       
   }
   
-    @Mutation(() => String)
-    public async updateMember(): Promise<string> {
-      console.log('Mutation: updateMember');
-      return this.memberService.updateMember();
-    }
-  
-    @Query(() => String)
-    public async getMember(): Promise<string> {
-      console.log('Query: getMember');
-      return this.memberService.getMember();
-    }
+  @Mutation(() => String)
+  public async updateMember(): Promise<string> {
+    console.log('Mutation: updateMember');
+    return this.memberService.updateMember();
+  }
+
+  @Query(() => String)
+  public async getMember(): Promise<string> {
+    console.log('Query: getMember');
+    return this.memberService.getMember();
+  }
+
+  //Admin only;
+
+  //Authorized Admin;
+  @Mutation(() => String)
+  public async getAllMembersByAdmin(): Promise<string> {
+    console.log('Mutation: getAllMembersByAdmin ');
+    return this.memberService.getAllMembersByAdmin();
+  }
+
+  //Authorized Admin;
+  @Mutation(() => String)
+  public async updateMemberByAdmin(): Promise<string> {
+    console.log('Mutation: updateMemberByAdmin ');
+    return this.memberService.updateMemberByAdmin();
+  }
+
   }
