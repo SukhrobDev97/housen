@@ -11,7 +11,6 @@ registerEnumType(ProjectType, {
 });
 
 export enum ProjectStatus {
-	DRAFT = 'DRAFT',
 	ACTIVE = 'ACTIVE',
 	COMPLETED = 'COMPLETED',
 	DELETE = 'DELETE',

@@ -1,4 +1,4 @@
-import { Resolver } from '@nestjs/graphql';
+import { Query, Resolver } from '@nestjs/graphql';
 import { ProjectService } from './project.service';
 import { MemberType } from '../../libs/enums/member.enum';
 import { Project } from '../../libs/dto/project/project';
@@ -9,6 +9,8 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { Args, Mutation } from '@nestjs/graphql';
 import type { ObjectId } from 'mongoose';
+import { WithoutGuard } from '../auth/guards/without.guard';
+import { shapeItIntoMongoObjectId } from '../../libs/config';
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -26,4 +28,17 @@ export class ProjectResolver {
             return await this.projectService.createProject(input)
       
     }
+
+    @UseGuards(WithoutGuard)
+      @Query(() => Project)
+      public async getProject(
+            @Args('projectId', { type: () => String }) input : string,
+            @AuthMember('_id') memberId: ObjectId
+      ): Promise<Project> {
+            console.log("Query: getProject");
+
+            const projectId = shapeItIntoMongoObjectId(input)
+            return await this.projectService.getProject(memberId, projectId)
+      }
+
 }

@@ -1,16 +1,22 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { ProjectInput } from '../../libs/dto/project/project.input';
 import { Project } from '../../libs/dto/project/project';
 import { Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
+import { ViewService } from '../view/view.service';
+import { ProjectStatus } from '../../libs/enums/project.enum';
+import { ViewInput } from '../../libs/dto/view/view.input';
+import { ViewGroup } from '../../libs/enums/view.enum';
+import { StatisticModifier, T } from '../../libs/types/common';
 
 @Injectable()
 export class ProjectService {
     constructor(     
         @InjectModel("Project") private readonly projectModel: Model<Project>,
-        private memberService: MemberService
+        private memberService: MemberService,
+        private viewService: ViewService
    ){}
 
    public async createProject(input: ProjectInput): Promise<Project> {
@@ -28,6 +34,43 @@ export class ProjectService {
       console.log('Error, Service.model:', err.message);
       throw new BadRequestException(Message.CREATE_FAILED);
     }
+  }
+
+  public async getProject(memberId: ObjectId, projectId: ObjectId): Promise<Project> {
+    const search : T = {
+      _id: projectId,
+      projectStatus: ProjectStatus.ACTIVE              
+    }
+
+    const targetProject = await this.projectModel.findOne(search);
+
+    if(!targetProject) {
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND)
+    }
+
+    if(memberId){
+      const viewInput : ViewInput = {memberId: memberId, viewRefId: projectId, viewGroup: ViewGroup.MEMBER} 
+      const newView = await this.viewService.recordView(viewInput);
+      if(newView) {
+        await this.projectStatsEditor({_id: projectId, targetKey: "projectViews", modifier: 1});
+        targetProject.projectViews ++ ;
+      }
+     
+    }
+     targetProject.memberData = await this.memberService.getMember(null, targetProject.memberId)
+
+    return targetProject;
+}
+
+ public async projectStatsEditor(input: StatisticModifier): Promise<Project | null> {
+    const { _id, targetKey, modifier } = input;
+    return await this.projectModel
+      .findOneAndUpdate(
+        { _id },
+        { $inc: { [targetKey]: modifier } },
+        { new: true },
+      )
+      .exec();
   }
   
 }
