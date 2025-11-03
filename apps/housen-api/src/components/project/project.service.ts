@@ -10,6 +10,8 @@ import { ProjectStatus } from '../../libs/enums/project.enum';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
+import { ProjectUpdate } from '../../libs/dto/project/project.update';
+import moment from 'moment';
 
 @Injectable()
 export class ProjectService {
@@ -61,6 +63,41 @@ export class ProjectService {
 
     return targetProject;
 }
+
+
+public async updateProject(
+    memberId: ObjectId,
+    input: ProjectUpdate,
+  ): Promise<Project> {
+    let { projectStatus, deletedAt } = input;
+  
+    const search: T = {
+      _id: input._id,
+      memberId: memberId,
+      propertyStatus: ProjectStatus.ACTIVE,
+    };
+  
+    if (projectStatus === ProjectStatus.DELETE) deletedAt  = moment().toDate();
+  
+    const result = await this.projectModel
+      .findOneAndUpdate(search, input, {
+        new: true,
+      })
+      .exec();
+  
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+  
+    if (deletedAt) {
+      await this.memberService.memberStatsEditor({
+        _id: memberId,
+        targetKey: 'memberProjects',
+        modifier: -1,
+      });
+    }
+  
+    return result;
+  }
+  
 
  public async projectStatsEditor(input: StatisticModifier): Promise<Project | null> {
     const { _id, targetKey, modifier } = input;

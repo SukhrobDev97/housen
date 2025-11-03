@@ -11,6 +11,8 @@ import { Args, Mutation } from '@nestjs/graphql';
 import type { ObjectId } from 'mongoose';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeItIntoMongoObjectId } from '../../libs/config';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { ProjectUpdate } from '../../libs/dto/project/project.update';
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -40,5 +42,19 @@ export class ProjectResolver {
             const projectId = shapeItIntoMongoObjectId(input)
             return await this.projectService.getProject(memberId, projectId)
       }
+
+    
+      @Roles(MemberType.AGENCY)
+      @UseGuards(RolesGuard)
+      @Mutation(() => Project)
+      public async updateProject(
+            @Args('input') input: ProjectUpdate,
+            @AuthMember('_id') memberId: ObjectId,
+      ): Promise<Project>{ 
+            console.log('Mutation: updateProject');
+            input._id = shapeItIntoMongoObjectId(input._id);
+            return await this.projectService.updateProject(memberId, input);
+            
+        }
 
 }
