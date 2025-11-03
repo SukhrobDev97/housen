@@ -81,9 +81,6 @@ const ProjectSchema = new Schema(
 			ref: 'Member',
 		},
 
-		constructedAt: {
-			type: Date,
-		},
 
 		deletedAt: {
 			type: Date,

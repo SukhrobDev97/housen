@@ -5,6 +5,7 @@ import { ViewModule } from '../view/view.module';
 import { ProjectResolver } from './project.resolver';
 import { ProjectService } from './project.service';
 import ProjectSchema from '../../schemas/Project.model';
+import { MemberModule } from '../member/member.module';
 
 @Module({
     imports:[
@@ -13,7 +14,9 @@ import ProjectSchema from '../../schemas/Project.model';
         ]), 
         AuthModule,
         ViewModule,
+        MemberModule
       ],
     providers: [ProjectResolver, ProjectService],
+    exports: [ProjectService],
 })
 export class ProjectModule {}
