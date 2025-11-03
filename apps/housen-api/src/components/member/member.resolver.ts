@@ -1,7 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { MemberService } from './member.service';
-import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
-import { Member } from '../../libs/dto/member/member';
+import { AgencyInquiry, LoginInput, MemberInput } from '../../libs/dto/member/member.input';
+import { Member, Members } from '../../libs/dto/member/member';
 import { UseGuards } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
@@ -34,19 +34,6 @@ export class MemberResolver {
   }
   
   @UseGuards(AuthGuard)
-  @Mutation(() => Member)
-  public async updateMember(
-    @Args('input') input: MemberUpdate,
-    @AuthMember('_id') memberId: mongoose.ObjectId
-  ): Promise<Member> {
-    console.log('Mutation: updateMember');
-    delete input._id;
-    return await this.memberService.updateMember(memberId, input);
-  }
-
-
-  
-  @UseGuards(AuthGuard)
   @Query(() => String)
   public async checkAuth(@AuthMember('memberNick') memberNick: string ): Promise<string> {
     console.log('Query: checkAuth');
@@ -62,6 +49,18 @@ export class MemberResolver {
     return `Hi ${authMember.memberNick}, you are ${authMember.memberType} (member_id) ${authMember._id}`
   }
 
+  @UseGuards(AuthGuard)
+  @Mutation(() => Member)
+  public async updateMember(
+    @Args('input') input: MemberUpdate,
+    @AuthMember('_id') memberId: mongoose.ObjectId
+  ): Promise<Member> {
+    console.log('Mutation: updateMember');
+    delete input._id;
+    return await this.memberService.updateMember(memberId, input);
+  }
+
+
   @UseGuards(WithoutGuard)
   @Query(() => Member)
   public async getMember(
@@ -71,6 +70,17 @@ export class MemberResolver {
     console.log('Query: getMember');
     const targetId = shapeItIntoMongoObjectId(input)
     return await this.memberService.getMember(memberId, targetId);
+  }
+
+  @UseGuards(WithoutGuard)
+  @Query(() => Members)
+  public async getAgencies(
+    @Args("input") input: AgencyInquiry,
+    @AuthMember('_id') memberId: mongoose.ObjectId
+  ): Promise<Members> {
+    console.log('Query: getAgencies');
+    
+    return this.memberService.getAgencies(memberId, input);
   }
 
   //Admin only;
