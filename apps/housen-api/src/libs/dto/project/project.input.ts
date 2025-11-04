@@ -1,7 +1,9 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { IsInt, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
+import { IsIn, IsInt, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import type { ObjectId } from 'mongoose';
 import { ProjectStyle, ProjectType } from '../../enums/project.enum';
+import { availableOptions, availableProjectSorts } from '../../config';
+import { Direction } from '../../enums/common.enum';
 
 @InputType()
 export class ProjectInput {
@@ -48,3 +50,88 @@ export class ProjectInput {
     memberId?: ObjectId;
   
   }
+
+
+  @InputType()
+export class PricesRange {
+  @Field(() => Int)
+  start: number;
+
+  @Field(() => Int)
+  end: number;
+}
+
+@InputType()
+export class SquaresRange {
+  @Field(() => Int)
+  start: number;
+
+  @Field(() => Int)
+  end: number;
+}
+
+@InputType()
+export class PeriodsRange {
+  @Field(() => Date)
+  start: Date;
+
+  @Field(() => Date)
+  end: Date;
+}
+
+@InputType()
+class PISearch {
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  memberId?: ObjectId;
+
+  @IsOptional()
+  @Field(() => [ProjectStyle], { nullable: true })
+  projectStyleList?: ProjectStyle[];
+
+  @IsOptional()
+  @Field(() => [ProjectType], { nullable: true })
+  typeList?: ProjectType[];
+
+  @IsOptional()
+  @IsIn(availableOptions, { each: true })
+  @Field(() => [String], { nullable: true })
+  options?: string[];
+
+  @IsOptional()
+  @Field(() => PricesRange, { nullable: true })
+  pricesRange?: PricesRange;
+
+  @IsOptional()
+  @Field(() => PeriodsRange, { nullable: true })
+  periodsRange?: PeriodsRange;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  text?: string;
+}
+@InputType()
+export class ProjectsInquiry {
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  page: number;
+
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
+
+  @IsOptional()
+  @IsIn(availableProjectSorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
+
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: Direction;
+
+  @IsNotEmpty()
+  @Field(() => PISearch)
+  search: PISearch;
+}

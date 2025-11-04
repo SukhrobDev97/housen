@@ -1,8 +1,8 @@
 import { Query, Resolver } from '@nestjs/graphql';
 import { ProjectService } from './project.service';
 import { MemberType } from '../../libs/enums/member.enum';
-import { Project } from '../../libs/dto/project/project';
-import { ProjectInput } from '../../libs/dto/project/project.input';
+import { Project, Projects } from '../../libs/dto/project/project';
+import { ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -56,5 +56,16 @@ export class ProjectResolver {
             return await this.projectService.updateProject(memberId, input);
             
         }
+
+      @UseGuards(WithoutGuard)
+      @Query(() => Projects)
+      public async getProperties(
+            @Args('input') input: ProjectsInquiry,
+            @AuthMember('_id') memberId: ObjectId,
+      ): Promise<Projects> {
+            console.log('Query: getProperties');
+            return await this.projectService.getProjects(memberId, input);
+}
+
 
 }

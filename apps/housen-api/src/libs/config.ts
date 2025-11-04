@@ -6,6 +6,16 @@ export const availableAgencySort = ['createdAt', 'updatedAt', 'memberLikes', 'me
 
 export const availableMemberSort = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews']
 
+export const availableOptions = ['projectStarter', 'projectPublic'];
+export const availableProjectSorts = [
+  'createdAt',
+  'updatedAt',
+  'projectLikes',
+  'projectViews',
+  'projectRank',
+  'projectPrice',
+];
+
 /** IMAGE CONFIGURATION **/
 export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 export const getSerialForImage = (filename: string) => {
@@ -16,3 +26,12 @@ export const getSerialForImage = (filename: string) => {
 export const shapeItIntoMongoObjectId = (target: any) => {
   return typeof target == 'string' ? new ObjectId(target) : target;
 };
+
+export const lookupMember = {
+	$lookup: {
+	  from: 'members',
+	  localField: 'memberId',
+	  foreignField: '_id',
+	  as: 'memberData',
+	},
+  };

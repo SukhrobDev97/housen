@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { ProjectInput } from '../../libs/dto/project/project.input';
-import { Project } from '../../libs/dto/project/project';
-import { Message } from '../../libs/enums/common.enum';
+import { ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
+import { Project, Projects } from '../../libs/dto/project/project';
+import { Direction, Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
 import { ViewService } from '../view/view.service';
 import { ProjectStatus } from '../../libs/enums/project.enum';
@@ -12,6 +12,7 @@ import { ViewGroup } from '../../libs/enums/view.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { ProjectUpdate } from '../../libs/dto/project/project.update';
 import moment from 'moment';
+import { shapeItIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class ProjectService {
@@ -109,5 +110,64 @@ public async updateProject(
       )
       .exec();
   }
+
+  public async getProjects(
+    memberId: ObjectId,
+    input: ProjectsInquiry
+  ): Promise<Projects> {
+    const match: T = { projectStatus: ProjectStatus.ACTIVE };
+    const sort: T = { [input.sort ?? 'createdAt']: input.direction ?? Direction.DESC };
+  
+    console.log('match:', match);
+  
+    this.shapeMatchQuery(match, input);
+  
+    const result = await this.projectModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              { $lookup: { from: 'members', localField: 'memberId', foreignField: '_id', as: 'memberData' } },
+              { $unwind: '$memberData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+  
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+  
+    return result[0];
+  }
+
+  private shapeMatchQuery(match: T, input: ProjectsInquiry): void {
+    const {
+      memberId,
+      projectStyleList,
+      typeList,
+      pricesRange,
+      options,
+      text,
+    } = input.search;
+  
+    if (memberId) match.memberId = shapeItIntoMongoObjectId(memberId);
+    if (projectStyleList) match.projectStyleList = { $in: projectStyleList };
+    if (typeList) match.propertyType = { $in: typeList };
+  
+    if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };  
+    if (text) match.propertyTitle = { $regex: new RegExp(text, '') };
+  
+    if (options)
+      match['$or'] = options.map((ele) => {
+        return { [ele]: true };
+      });
+  }
+  
+  
   
 }
