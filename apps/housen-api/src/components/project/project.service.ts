@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { AgencyProjectsInquiry, ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
+import { AgencyProjectsInquiry, AllProjectsInquiry, ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
 import { Project, Projects } from '../../libs/dto/project/project';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
@@ -12,7 +12,7 @@ import { ViewGroup } from '../../libs/enums/view.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { ProjectUpdate } from '../../libs/dto/project/project.update';
 import moment from 'moment';
-import { shapeItIntoMongoObjectId } from '../../libs/config';
+import { lookupMember, shapeItIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class ProjectService {
@@ -211,5 +211,38 @@ public async updateProject(
     return result[0];
   }
   
+  /* only by admin */
+      
+  public async getAllProjectsByAdmin(input: AllProjectsInquiry): Promise<Projects> {
+    const { projectStatus, projectStyleList } = input.search;
+    const match: T = {};
+    const sort: T = { [input.sort ?? 'createdAt']: input.direction ?? Direction.DESC };
+  
+    if (projectStatus) match.propertyStatus = projectStatus;
+    if (projectStyleList) match.propertyLocation = { $in: projectStyleList };
+  
+    const result = await this.projectModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupMember,
+              { $unwind: '$memberData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+  
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+  
+    return result[0];            
+  }
+              
   
 }

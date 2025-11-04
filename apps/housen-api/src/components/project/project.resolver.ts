@@ -2,7 +2,7 @@ import { Query, Resolver } from '@nestjs/graphql';
 import { ProjectService } from './project.service';
 import { MemberType } from '../../libs/enums/member.enum';
 import { Project, Projects } from '../../libs/dto/project/project';
-import { AgencyProjectsInquiry, ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
+import { AgencyProjectsInquiry, AllProjectsInquiry, ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -79,4 +79,15 @@ export class ProjectResolver {
             return await this.projectService.getAgencyProjects(memberId, input);
       }
 
+      /* only by admin */
+      @Roles(MemberType.ADMIN)
+      @UseGuards(RolesGuard)
+      @Query((returns) => Projects)
+      public async getAllProjectsByAdmin(
+            @Args('input') input: AllProjectsInquiry,
+            @AuthMember('_id') memberId: ObjectId,
+      ): Promise<Projects> {
+            console.log('Query: getAllProjectsByAdmin');
+            return await this.projectService.getAllProjectsByAdmin(input);
+}
 }

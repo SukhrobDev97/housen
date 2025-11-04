@@ -169,3 +169,42 @@ export class AgencyProjectsInquiry {
   @Field(() => APISearch)
   search: APISearch;
 }
+
+
+@InputType()
+class ALPISearch {
+  @IsOptional()
+  @Field(() => ProjectStatus, { nullable: true })
+  projectStatus?: ProjectStatus;
+
+@IsOptional()
+@Field(() => [ProjectStyle], { nullable: true })
+projectStyleList?: ProjectStyle[];
+}
+
+
+@InputType()
+export class AllProjectsInquiry {
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  page: number;
+
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
+
+  @IsOptional()
+  @IsIn(availableProjectSorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
+
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: Direction;
+
+  @IsNotEmpty()
+  @Field(() => ALPISearch)
+  search: ALPISearch;
+}
