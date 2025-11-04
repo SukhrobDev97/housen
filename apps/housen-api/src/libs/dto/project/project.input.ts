@@ -1,7 +1,7 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsIn, IsInt, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import type { ObjectId } from 'mongoose';
-import { ProjectStyle, ProjectType } from '../../enums/project.enum';
+import { ProjectStatus, ProjectStyle, ProjectType } from '../../enums/project.enum';
 import { availableOptions, availableProjectSorts } from '../../config';
 import { Direction } from '../../enums/common.enum';
 
@@ -134,4 +134,38 @@ export class ProjectsInquiry {
   @IsNotEmpty()
   @Field(() => PISearch)
   search: PISearch;
+}
+
+
+@InputType()
+class APISearch {
+  @IsOptional()
+  @Field(() => ProjectStatus, { nullable: true })
+  projectStatus?: ProjectStatus;
+}
+
+@InputType()
+export class AgencyProjectsInquiry {
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  page: number;
+
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
+
+  @IsOptional()
+  @IsIn(availableProjectSorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
+
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: Direction;
+
+  @IsNotEmpty()
+  @Field(() => APISearch)
+  search: APISearch;
 }

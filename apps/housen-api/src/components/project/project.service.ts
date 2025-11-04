@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
+import { AgencyProjectsInquiry, ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
 import { Project, Projects } from '../../libs/dto/project/project';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
@@ -168,6 +168,48 @@ public async updateProject(
       });
   }
   
+  
+  public async getAgencyProjects(
+    memberId: ObjectId,
+    input: AgencyProjectsInquiry
+  ): Promise<Projects> {
+    if (input.search.projectStatus === ProjectStatus.DELETE)
+      throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
+  
+    const match: T = {
+      memberId,
+      propertyStatus: {
+        $ne: ProjectStatus.DELETE,
+      },
+    };
+  
+    const sort: T = {
+      [input?.sort ?? "createdAt"]: input?.direction ?? Direction.DESC,
+    };
+  
+    const result = await this.projectModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              { $lookup: { from: "memberData", localField: "memberId", foreignField: "_id", as: "memberData" } },
+              { $unwind: "$memberData" },
+            ],
+            metaCounter: [{ $count: "total" }],
+          },
+        },
+      ])
+      .exec();
+  
+    if (!result.length)
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+  
+    return result[0];
+  }
   
   
 }
