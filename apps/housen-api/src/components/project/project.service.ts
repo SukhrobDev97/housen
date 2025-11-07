@@ -63,6 +63,10 @@ export class ProjectService {
         targetProject.projectViews ++ ;
       }
      
+      const likeInput = {memberId: memberId, likeRefId: projectId, likeGroup: LikeGroup.PROJECT}
+      targetProject.meLiked = await this.likeService.checkLikeExistence(likeInput)                
+               
+
     }
      targetProject.memberData = await this.memberService.getMember(null, targetProject.memberId)
 
