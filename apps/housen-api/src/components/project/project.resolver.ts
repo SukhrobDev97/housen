@@ -13,6 +13,7 @@ import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeItIntoMongoObjectId } from '../../libs/config';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { ProjectUpdate } from '../../libs/dto/project/project.update';
+import mongoose from 'mongoose';
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -78,6 +79,20 @@ export class ProjectResolver {
             console.log('Query: getAgencyProjects');
             return await this.projectService.getAgencyProjects(memberId, input);
       }
+
+
+
+      @UseGuards(AuthGuard)
+      @Mutation(() => Project)
+      public async likeTargetProject(
+        @Args("projectId") input: string,
+        @AuthMember('_id') memberId: mongoose.ObjectId
+      ): Promise<Project>{ 
+        console.log('Mutation: likeTargetMember');
+        const likeRefId = shapeItIntoMongoObjectId(input)
+        return await this.projectService.likeTargetProject(memberId,likeRefId);
+      }
+      
 
       /* only by admin */
       @Roles(MemberType.ADMIN)

@@ -6,6 +6,7 @@ import { ProjectResolver } from './project.resolver';
 import { ProjectService } from './project.service';
 import ProjectSchema from '../../schemas/Project.model';
 import { MemberModule } from '../member/member.module';
+import { LikeModule } from '../like/like.module';
 
 @Module({
     imports:[
@@ -14,7 +15,8 @@ import { MemberModule } from '../member/member.module';
         ]), 
         AuthModule,
         ViewModule,
-        MemberModule
+        MemberModule,
+        LikeModule
       ],
     providers: [ProjectResolver, ProjectService],
     exports: [ProjectService],

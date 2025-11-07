@@ -94,7 +94,7 @@ export class MemberResolver {
 
 
   @UseGuards(AuthGuard)
-  @Query(() => Member)
+  @Mutation(() => Member)
   public async likeTargetMember(
     @Args("memberId") input: string,
     @AuthMember('_id') memberId: mongoose.ObjectId

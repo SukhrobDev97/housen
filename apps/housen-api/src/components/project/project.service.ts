@@ -13,13 +13,17 @@ import { StatisticModifier, T } from '../../libs/types/common';
 import { ProjectUpdate } from '../../libs/dto/project/project.update';
 import moment from 'moment';
 import { lookupMember, shapeItIntoMongoObjectId } from '../../libs/config';
+import { LikeService } from '../like/like.service';
+import { LikeInput } from '../../libs/dto/like/like.input';
+import { LikeGroup } from '../../libs/enums/like.enum';
 
 @Injectable()
 export class ProjectService {
     constructor(     
         @InjectModel("Project") private readonly projectModel: Model<Project>,
         private memberService: MemberService,
-        private viewService: ViewService
+        private viewService: ViewService,
+        private likeService: LikeService
    ){}
 
    public async createProject(input: ProjectInput): Promise<Project> {
@@ -210,6 +214,24 @@ public async updateProject(
   
     return result[0];
   }
+
+  public async likeTargetProject ( memberId: ObjectId, likeRefId: ObjectId ): Promise<Project>{
+    const target: Project | null = await this.projectModel.findOne({_id: likeRefId, projectStatus: ProjectStatus.ACTIVE}).exec()
+    if(!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND)
+    
+    const input : LikeInput = {
+      memberId: memberId,
+      likeRefId: likeRefId,
+      likeGroup: LikeGroup.PROJECT
+    }
+
+    const modifier: number = await this.likeService.toggleLike(input)
+    const result =  await this.projectStatsEditor({_id: likeRefId, targetKey: "projectLikes", modifier: modifier})
+    if(!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG)
+
+    return result
+}
+
   
   /* only by admin */
       
