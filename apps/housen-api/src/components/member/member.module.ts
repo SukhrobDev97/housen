@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
 import { ViewModule } from '../view/view.module';
 import { LikeModule } from '../like/like.module';
+import { FollowModule } from '../follow/follow.module';
 
 @Module({
   imports:[
@@ -14,7 +15,8 @@ import { LikeModule } from '../like/like.module';
     ]), 
     AuthModule,
     ViewModule,
-    LikeModule
+    LikeModule,
+    FollowModule
   ],
   providers: [MemberResolver, MemberService],
   exports: [MemberService],
