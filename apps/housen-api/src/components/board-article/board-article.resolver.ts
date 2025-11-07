@@ -12,6 +12,7 @@ import { BoardArticleUpdate } from '../../libs/dto/board-article/board-article-u
 import { MemberType } from '../../libs/enums/member.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import mongoose from 'mongoose';
 
 @Resolver()
 export class BoardArticleResolver {
@@ -60,6 +61,17 @@ export class BoardArticleResolver {
             }
             
          
+        @UseGuards(AuthGuard)
+        @Mutation(() => BoardArticle)
+        public async likeTargetBoardArticle(
+            @Args("boardArticleId") input: string,
+            @AuthMember('_id') memberId: mongoose.ObjectId
+        ): Promise<BoardArticle> {
+            console.log('Mutation: likeTargetBoardArticle');
+            const likeRefId = shapeItIntoMongoObjectId(input)
+            return await this.boardArticleService.likeTargetBoardArticle(memberId,likeRefId);
+                
+        }
 
         /* ADMIN only */
 
