@@ -26,9 +26,9 @@ export class CommentService {
    public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
     input.memberId = memberId;
 
-    let result: (Comment & Document) | null = null
+    let result: Comment | null = null
     try {
-       const result = await this.commentModel.create(input);
+       result = await this.commentModel.create(input);
     } catch (err) {
         console.log('Error_Service.createComment', err.message);
         throw new BadRequestException(Message.CREATE_FAILED);
