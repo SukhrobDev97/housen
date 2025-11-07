@@ -176,6 +176,8 @@ files: Promise<FileUpload>[],
 
 			const imageName = getSerialForImage(filename);
 			const url = `uploads/${target}/${imageName}`;
+      console.log('Uploading:', url);
+
 			const stream = createReadStream();
 
 			const result = await new Promise((resolve, reject) => {
@@ -193,7 +195,7 @@ files: Promise<FileUpload>[],
 	});
 
 	await Promise.all(promisedList);
-	return uploadedImages;
+	return uploadedImages?.filter(Boolean) || [] ;
 }
 
 
