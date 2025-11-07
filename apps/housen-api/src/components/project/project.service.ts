@@ -273,6 +273,14 @@ public async updateProject(
     return result;
   }
 
+  public async removeProjectByAdmin(projectId: ObjectId): Promise<Project> {
+    const search = { _id: projectId, projectStatus: ProjectStatus.DELETE };
+    const result = await this.projectModel.findOneAndDelete(search).exec();
+    if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+  
+    return result;
+  }
+  
               
   
 }

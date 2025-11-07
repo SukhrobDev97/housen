@@ -100,4 +100,15 @@ export class ProjectResolver {
             return await this.projectService.updateProjectByAdmin(input);
       }
 
+
+      @Roles(MemberType.ADMIN)
+      @UseGuards(RolesGuard)
+      @Mutation(() => Project)
+      public async removeProjectByAdmin(@Args('projectId') input: string): Promise<Project> {
+            console.log('Mutation: removeProjectByAdmin');
+            const projectId = shapeItIntoMongoObjectId(input);
+            return await this.projectService.removeProjectByAdmin(projectId);
+      }
+
+
 }
