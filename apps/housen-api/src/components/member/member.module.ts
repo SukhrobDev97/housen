@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import {forwardRef, Module } from '@nestjs/common';
 import { MemberResolver } from './member.resolver';
 import { MemberService } from './member.service';
 import MemberSchema from '../../schemas/Member.model';
@@ -16,7 +16,7 @@ import { FollowModule } from '../follow/follow.module';
     AuthModule,
     ViewModule,
     LikeModule,
-    FollowModule
+    
   ],
   providers: [MemberResolver, MemberService],
   exports: [MemberService],
