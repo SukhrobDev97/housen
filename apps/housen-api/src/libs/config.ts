@@ -16,6 +16,8 @@ export const availableProjectSorts = [
   'projectPrice',
 ];
 
+export const availableBoardArticleSorts = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews' ]
+
 /** IMAGE CONFIGURATION **/
 export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 export const getSerialForImage = (filename: string) => {
