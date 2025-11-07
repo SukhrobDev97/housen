@@ -15,10 +15,15 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { createWriteStream } from 'fs';
 import { Message } from '../../libs/enums/common.enum';
+import { LikeService } from '../like/like.service';
+import  { ObjectId } from 'mongoose';
 
 @Resolver()
 export class MemberResolver {
-    constructor( private readonly memberService: MemberService) {}
+    constructor( 
+      private readonly memberService: MemberService,
+      private readonly likeService: LikeService
+    ) {}
 
   @Mutation(() => Member)
   public async signup(@Args('input') input: MemberInput): Promise<Member> {
@@ -86,6 +91,19 @@ export class MemberResolver {
     
     return this.memberService.getAgencies(memberId, input);
   }
+
+
+  @UseGuards(AuthGuard)
+  @Query(() => Member)
+  public async likeTargetMember(
+    @Args("memberId") input: string,
+    @AuthMember('_id') memberId: mongoose.ObjectId
+  ): Promise<Member> {
+    console.log('Query: getMember');
+    const likeRefId = shapeItIntoMongoObjectId(input)
+    return await this.memberService.likeTargetMember(memberId,likeRefId);
+  }
+
 
   //Admin only;
 
