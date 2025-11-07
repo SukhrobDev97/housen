@@ -67,6 +67,7 @@ export class BoardArticleService {
                 targetBoardArticle.articleViews++;
               }
 
+              console.log('Article memberId =>', targetBoardArticle.memberId);
               const likeInput = {memberId: memberId, likeRefId: articleId , likeGroup: LikeGroup.ARTICLE}
               targetBoardArticle.meLiked = await this.likeService.checkLikeExistence(likeInput)                
              
@@ -170,7 +171,7 @@ export class BoardArticleService {
 
         
           public async likeTargetBoardArticle ( memberId: ObjectId, likeRefId: ObjectId ): Promise<BoardArticle>{
-            const target: BoardArticle | null = await this.boardArticleModel.findOne({_id: likeRefId, boardArticleStatus: BoardArticleStatus.ACTIVE}).exec()
+            const target: BoardArticle | null = await this.boardArticleModel.findOne({_id: likeRefId, articleStatus: BoardArticleStatus.ACTIVE}).exec()
             if(!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND)
             
             const input : LikeInput = {
