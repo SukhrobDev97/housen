@@ -9,7 +9,7 @@ import { Direction, Message } from '../../libs/enums/common.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { BoardArticleStatus } from '../../libs/enums/board-article.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
-import { lookupMember, shapeItIntoMongoObjectId } from '../../libs/config';
+import { lookupAuthMemberLiked, lookupMember, shapeItIntoMongoObjectId } from '../../libs/config';
 import { BoardArticleUpdate } from '../../libs/dto/board-article/board-article-update';
 import { LikeService } from '../like/like.service';
 import { LikeInput } from '../../libs/dto/like/like.input';
@@ -70,8 +70,6 @@ export class BoardArticleService {
               console.log('Article memberId =>', targetBoardArticle.memberId);
               const likeInput = {memberId: memberId, likeRefId: articleId , likeGroup: LikeGroup.ARTICLE}
               targetBoardArticle.meLiked = await this.likeService.checkLikeExistence(likeInput)                
-             
-              // meLiked
             }
           
             const memberData = await this.memberService.getMember(null, targetBoardArticle.memberId);
@@ -149,14 +147,8 @@ export class BoardArticleService {
                   list: [
                     { $skip: (input.page - 1) * input.limit },
                     { $limit: input.limit },
-                    {
-                      $lookup: {
-                        from: 'member',
-                        localField: 'memberId',
-                        foreignField: '_id',
-                        as: 'memberData',
-                      },
-                    },
+                    lookupAuthMemberLiked(memberId),
+                    lookupMember,
                     { $unwind: '$memberData' },
                   ],
                   metaCounter: [{ $count: 'total' }],
