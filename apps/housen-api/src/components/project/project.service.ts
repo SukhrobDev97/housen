@@ -243,6 +243,36 @@ public async updateProject(
   
     return result[0];            
   }
+
+
+  public async updateProjectByAdmin(input: ProjectUpdate): Promise<Project> {
+    let { projectStatus, deletedAt} = input;
+    const search: T = {
+        _id: input._id,
+        projectStatus: ProjectStatus.ACTIVE,
+    };
+
+     if (projectStatus === ProjectStatus.DELETE) deletedAt = moment().toDate();
+
+    const result = await this.projectModel
+        .findOneAndUpdate(search, input, {
+            new: true,
+        })
+        .exec();
+
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+    if (deletedAt) {
+        await this.memberService.memberStatsEditor({
+            _id: result.memberId,
+            targetKey: 'memberProjects',
+            modifier: -1,
+        });
+    }
+
+    return result;
+  }
+
               
   
 }

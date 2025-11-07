@@ -89,5 +89,15 @@ export class ProjectResolver {
       ): Promise<Projects> {
             console.log('Query: getAllProjectsByAdmin');
             return await this.projectService.getAllProjectsByAdmin(input);
-}
+      }
+
+      @Roles(MemberType.ADMIN)
+      @UseGuards(RolesGuard)
+      @Mutation((returns) => Project)
+      public async updateProjectByAdmin(@Args('input') input: ProjectUpdate): Promise<Project> {
+            console.log('Mutation: updateProjectByAdmin');
+            input._id = shapeItIntoMongoObjectId(input._id);
+            return await this.projectService.updateProjectByAdmin(input);
+      }
+
 }
