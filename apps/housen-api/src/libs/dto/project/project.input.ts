@@ -9,7 +9,7 @@ import { Direction } from '../../enums/common.enum';
 export class ProjectInput {
     @IsNotEmpty()
     @Field(() => ProjectType)
-    propertyType: ProjectType;
+    projectType: ProjectType;
   
     @IsNotEmpty()
     @Field(() => ProjectStyle)

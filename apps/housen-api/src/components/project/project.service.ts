@@ -83,7 +83,7 @@ public async updateProject(
     const search: T = {
       _id: input._id,
       memberId: memberId,
-      propertyStatus: ProjectStatus.ACTIVE,
+      projectStatus: ProjectStatus.ACTIVE,
     };
   
     if (projectStatus === ProjectStatus.DELETE) deletedAt  = moment().toDate();
@@ -166,10 +166,10 @@ public async updateProject(
   
     if (memberId) match.memberId = shapeItIntoMongoObjectId(memberId);
     if (projectStyleList && projectStyleList.length) match.projectStyleList = { $in: projectStyleList };
-    if (typeList && typeList.length) match.propertyType = { $in: typeList };
+    if (typeList && typeList.length) match.projectType = { $in: typeList };
   
-    if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };  
-    if (text) match.propertyTitle = { $regex: new RegExp(text, '') };
+    if (pricesRange) match.projectPrice = { $gte: pricesRange.start, $lte: pricesRange.end };  
+    if (text) match.projectTitle = { $regex: new RegExp(text, '') };
   
     if (options)
       match['$or'] = options.map((ele) => {
@@ -194,7 +194,7 @@ public async updateProject(
   
     const match: T = {
       memberId,
-      propertyStatus: {
+      projectStatus: {
         $ne: ProjectStatus.DELETE,
       },
     };
@@ -252,8 +252,8 @@ public async updateProject(
     const match: T = {};
     const sort: T = { [input.sort ?? 'createdAt']: input.direction ?? Direction.DESC };
   
-    if (projectStatus) match.propertyStatus = projectStatus;
-    if (projectStyleList) match.propertyLocation = { $in: projectStyleList };
+    if (projectStatus) match.projectStatus = projectStatus;
+    if (projectStyleList) match.projectLocation = { $in: projectStyleList };
   
     const result = await this.projectModel
       .aggregate([

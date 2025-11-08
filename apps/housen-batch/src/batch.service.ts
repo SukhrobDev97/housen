@@ -22,10 +22,10 @@ export class BatchService {
         await this.projectModel
         .updateMany(
           {
-            propertyStatus: ProjectStatus.ACTIVE,
+            projectStatus: ProjectStatus.ACTIVE,
           },
           {
-            propertyRank: 0,
+            projectRank: 0,
           }
         )
         .exec();
