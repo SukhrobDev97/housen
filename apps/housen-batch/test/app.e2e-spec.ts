@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { HousenAppModule } from '../src/housen-batch.module';
+import { HousenAppModule } from '../src/batch.module';
 
 describe('HousenAppController (e2e)', () => {
   let app: INestApplication;
