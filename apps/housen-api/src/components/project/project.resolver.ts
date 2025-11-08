@@ -2,7 +2,7 @@ import { Query, Resolver } from '@nestjs/graphql';
 import { ProjectService } from './project.service';
 import { MemberType } from '../../libs/enums/member.enum';
 import { Project, Projects } from '../../libs/dto/project/project';
-import { AgencyProjectsInquiry, AllProjectsInquiry, ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
+import { AgencyProjectsInquiry, AllProjectsInquiry, OrdinaryInquiry, ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -67,6 +67,17 @@ export class ProjectResolver {
             console.log('Query: getProperties');
             return await this.projectService.getProjects(memberId, input);
       }
+
+      @UseGuards(AuthGuard)
+      @Query(() => Projects)
+      public async getFavorites(
+            @Args('input') input: OrdinaryInquiry,
+            @AuthMember('_id') memberId: ObjectId,
+      ): Promise<Projects> {
+            console.log('Query: getFavorites');
+            return await this.projectService.getFavorites(memberId, input);
+      }
+
 
 
       @Roles(MemberType.AGENCY)

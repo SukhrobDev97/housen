@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { AgencyProjectsInquiry, AllProjectsInquiry, ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
+import { AgencyProjectsInquiry, AllProjectsInquiry, OrdinaryInquiry, ProjectInput, ProjectsInquiry } from '../../libs/dto/project/project.input';
 import { Project, Projects } from '../../libs/dto/project/project';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
@@ -177,6 +177,10 @@ public async updateProject(
       });
   }
   
+
+  public async getFavorites (memberId: ObjectId, input: OrdinaryInquiry): Promise<Projects>{
+    return await this.likeService.getFavoriteProjects(memberId, input)
+  }
   
   public async getAgencyProjects(
     memberId: ObjectId,
