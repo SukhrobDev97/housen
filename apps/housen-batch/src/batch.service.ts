@@ -62,7 +62,7 @@ export class BatchService {
       }
     
       public async batchTopAgencies(): Promise<void> {
-        const agents: Member[] = await this.memberModel
+        const agencies: Member[] = await this.memberModel
         .find({
           memberType: MemberType.AGENCY,
           memberStatus: MemberStatus.ACTIVE,
@@ -70,7 +70,7 @@ export class BatchService {
         })
         .exec();
     
-        const promisedList = agents.map(async (ele: Member) => {
+        const promisedList = agencies.map(async (ele: Member) => {
           const { _id, memberProjects, memberLikes, memberArticles, memberViews } = ele;
           const rank = memberProjects * 4 + memberArticles * 3 + memberLikes * 2 + memberViews * 1;
           return await this.memberModel.findByIdAndUpdate(_id, { memberRank: rank });
