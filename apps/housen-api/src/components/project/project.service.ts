@@ -177,9 +177,12 @@ public async updateProject(
       });
   }
   
-
   public async getFavorites (memberId: ObjectId, input: OrdinaryInquiry): Promise<Projects>{
     return await this.likeService.getFavoriteProjects(memberId, input)
+  }
+
+  public async getVisited (memberId: ObjectId, input: OrdinaryInquiry): Promise<Projects>{
+    return await this.viewService.getVisitedProjects(memberId, input)
   }
   
   public async getAgencyProjects(

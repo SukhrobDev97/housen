@@ -79,6 +79,17 @@ export class ProjectResolver {
       }
 
 
+      @UseGuards(AuthGuard)
+      @Query(() => Projects)
+      public async getVisited(
+            @Args('input') input: OrdinaryInquiry,
+            @AuthMember('_id') memberId: ObjectId,
+      ): Promise<Projects> {
+            console.log('Query: getVisited');
+            return await this.projectService.getVisited(memberId, input);
+      }
+
+
 
       @Roles(MemberType.AGENCY)
       @UseGuards(RolesGuard)
