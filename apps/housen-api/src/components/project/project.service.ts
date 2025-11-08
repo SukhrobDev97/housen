@@ -165,8 +165,8 @@ public async updateProject(
     } = input.search;
   
     if (memberId) match.memberId = shapeItIntoMongoObjectId(memberId);
-    if (projectStyleList) match.projectStyleList = { $in: projectStyleList };
-    if (typeList) match.propertyType = { $in: typeList };
+    if (projectStyleList && projectStyleList.length) match.projectStyleList = { $in: projectStyleList };
+    if (typeList && typeList.length) match.propertyType = { $in: typeList };
   
     if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };  
     if (text) match.propertyTitle = { $regex: new RegExp(text, '') };
