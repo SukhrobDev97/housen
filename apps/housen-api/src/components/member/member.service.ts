@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { AgencyInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
+import { AgenciesInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
 import { Member, Members } from '../../libs/dto/member/member';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { MemberStatus, MemberType } from '../../libs/enums/member.enum';
@@ -121,7 +121,7 @@ export class MemberService {
     }
 
 
-    public async getAgencies(memberId: ObjectId, input: AgencyInquiry): Promise<Members> {
+    public async getAgencies(memberId: ObjectId, input: AgenciesInquiry): Promise<Members> {
       const { text } = input.search;
       const match: T = { memberType: MemberType.AGENCY, memberStatus: MemberStatus.ACTIVE };
       const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };

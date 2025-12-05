@@ -55,7 +55,7 @@ export class LoginInput {
 
 
 @InputType()
-export class AgencyInquiry {
+export class AgenciesInquiry {
   @Min(1)
   @IsNotEmpty()
   @Field(() => Int)
