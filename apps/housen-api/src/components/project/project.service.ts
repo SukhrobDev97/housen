@@ -56,7 +56,7 @@ export class ProjectService {
     }
 
     if(memberId){
-      const viewInput : ViewInput = {memberId: memberId, viewRefId: projectId, viewGroup: ViewGroup.MEMBER} 
+      const viewInput : ViewInput = {memberId: memberId, viewRefId: projectId, viewGroup: ViewGroup.PROJECT} 
       const newView = await this.viewService.recordView(viewInput);
       if(newView) {
         await this.projectStatsEditor({_id: projectId, targetKey: "projectViews", modifier: 1});

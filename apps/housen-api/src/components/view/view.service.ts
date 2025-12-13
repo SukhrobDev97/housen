@@ -7,7 +7,7 @@ import { T } from '../../libs/types/common';
 import { OrdinaryInquiry } from '../../libs/dto/project/project.input';
 import { Projects } from '../../libs/dto/project/project';
 import { ViewGroup } from '../../libs/enums/view.enum';
-import { lookupVisit } from '../../libs/config';
+import { lookupVisit, shapeItIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class ViewService {
@@ -29,7 +29,9 @@ export class ViewService {
 
     public async getVisitedProjects(memberId: ObjectId, input: OrdinaryInquiry): Promise<Projects> {
         const { page, limit } = input;
-        const match = { viewGroup: ViewGroup.PROJECT, memberId: memberId };
+        const match = { viewGroup: ViewGroup.PROJECT, memberId: shapeItIntoMongoObjectId(memberId) };
+        
+        console.log('getVisitedProjects match:', match);
       
         const data: T = await this.viewModel
         

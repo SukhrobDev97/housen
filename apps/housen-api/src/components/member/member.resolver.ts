@@ -13,7 +13,7 @@ import { getSerialForImage, shapeItIntoMongoObjectId, validMimeTypes } from '../
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
-import { createWriteStream } from 'fs';
+import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { Message } from '../../libs/enums/common.enum';
 import { LikeService } from '../like/like.service';
 import  { ObjectId } from 'mongoose';
@@ -143,14 +143,21 @@ const validMime = validMimeTypes.includes(mimetype);
 if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
 
 const imageName = getSerialForImage(filename);
-const url = `uploads/${target}/${imageName}`;
+const dir = `uploads/${target}`;
+const url = `${dir}/${imageName}`;
+
+// Ensure directory exists
+if (!existsSync(dir)) {
+	mkdirSync(dir, { recursive: true });
+}
+
 const stream = createReadStream();
 
 const result = await new Promise((resolve, reject) => {
 	stream
 		.pipe(createWriteStream(url))
-		.on('finish', async () => resolve(true))
-		.on('error', () => reject(false));
+		.on('finish', () => resolve(true))
+		.on('error', (err) => reject(err));
 });
 if (!result) throw new Error(Message.UPLOAD_FAILED);
 
@@ -175,8 +182,14 @@ files: Promise<FileUpload>[],
 			if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
 
 			const imageName = getSerialForImage(filename);
-			const url = `uploads/${target}/${imageName}`;
-      console.log('Uploading:', url);
+			const dir = `uploads/${target}`;
+			const url = `${dir}/${imageName}`;
+			console.log('Uploading:', url);
+
+			// Ensure directory exists
+			if (!existsSync(dir)) {
+				mkdirSync(dir, { recursive: true });
+			}
 
 			const stream = createReadStream();
 
@@ -184,13 +197,13 @@ files: Promise<FileUpload>[],
 				stream
 					.pipe(createWriteStream(url))
 					.on('finish', () => resolve(true))
-					.on('error', () => reject(false));
+					.on('error', (err) => reject(err));
 			});
 			if (!result) throw new Error(Message.UPLOAD_FAILED);
 
 			uploadedImages[index] = url;
 		} catch (err) {
-			console.log('Error, file missing!');
+			console.log('Error uploading file:', err.message || err);
 		}
 	});
 
