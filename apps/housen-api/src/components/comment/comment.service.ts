@@ -96,6 +96,7 @@ public async updateComment(memberId: ObjectId, input: CommentUpdate): Promise<Co
             { $skip: (input.page - 1) * input.limit },
             { $limit: input.limit },
             lookupMember,
+            { $unwind: '$memberData' },
           ],
           metaCounter: [{ $count: 'total' }],
         },
