@@ -1,0 +1,38 @@
+version: '3.3'
+
+services:
+  housen-api:
+    container_name: housen-api
+    restart: always
+    image: node:20.10.0
+    ports:
+      - "4000:3005"
+    volumes:
+      - ./:/usr/src/housen
+    working_dir: /usr/src/housen
+    networks:
+      - monorepo-network
+    command: bash -c "npm install && npm run build && npm run start:prod"
+
+  housen-batch:
+    container_name: housen-batch
+    restart: unless-stopped
+    image: node:20.10.0
+    ports:
+      - "4002:3006"
+    volumes:
+      - ./:/usr/src/housen
+    working_dir: /usr/src/housen
+    networks:
+      - monorepo-network
+    command: bash -c "npm install && npm run build && npm run start:prod:batch"
+
+networks:
+  monorepo-network:
+    driver: bridge
+
+
+
+#housen-client: localhost:4001 <=> container: 3000
+#housen-api: localhost:4000 <=> container: 3005
+#housen-batch: localhost:4002 <=> container: 3006
