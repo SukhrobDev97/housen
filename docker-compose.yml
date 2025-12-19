@@ -6,7 +6,9 @@ services:
     restart: always
     image: node:20.10.0
     ports:
-      - "4000:3005"
+      - 4000:3005
+    environment:
+      - PORT_API=3005
     volumes:
       - ./:/usr/src/housen
     working_dir: /usr/src/housen
@@ -19,7 +21,7 @@ services:
     restart: unless-stopped
     image: node:20.10.0
     ports:
-      - "4002:3006"
+      - 4002:3006
     volumes:
       - ./:/usr/src/housen
     working_dir: /usr/src/housen
