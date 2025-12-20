@@ -9,6 +9,7 @@ services:
       - 4000:3005
     environment:
       - PORT_API=3005
+      - OPENAI_API_KEY: ${OPENAI_API_KEY}
     volumes:
       - ./:/usr/src/housen
     working_dir: /usr/src/housen

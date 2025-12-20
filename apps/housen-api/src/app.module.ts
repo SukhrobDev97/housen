@@ -9,6 +9,7 @@ import { ComponentsModule } from './components/components.module';
 import { DatabaseModule } from './database/database.module';
 import { T } from './libs/types/common';
 import { SocketModule } from './socket/socket.module';
+import { AiModule } from './components/ai/ai.module';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { SocketModule } from './socket/socket.module';
         console.log("GraphQl Global Error:", graphQlFormattedAError)
         return graphQlFormattedAError;
       }
-    }), ComponentsModule, DatabaseModule, SocketModule],
+    }), ComponentsModule, DatabaseModule, SocketModule, AiModule],
   controllers: [AppController],
   providers: [AppService, AppResolver],
 })
