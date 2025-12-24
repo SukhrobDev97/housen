@@ -1,47 +1,34 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
+import axios from 'axios';
 
 @Injectable()
 export class AiService {
-  private readonly ollamaUrl = 'http://172.17.0.1:11434';
-  private readonly model = 'mistral:latest';
+  private readonly ollamaUrl = process.env.OLLAMA_URL || 'http://ollama:11434';
+  private readonly model = process.env.OLLAMA_MODEL || 'mistral:latest';
 
   async askQuestion(question: string): Promise<string> {
-    let res: Response;
-
     try {
-      res = await fetch(`${this.ollamaUrl}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const res = await axios.post(
+        `${this.ollamaUrl}/api/generate`,
+        {
           model: this.model,
           prompt: question,
           stream: false,
-        }),
-      });
-    } catch (networkErr) {
-      console.error('❌ NETWORK ERROR TO OLLAMA', networkErr);
-      return 'AI network error';
-    }
+        },
+        {
+          timeout: 120000, // 2 minut
+        },
+      );
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      console.error('❌ OLLAMA BAD RESPONSE', res.status, text);
-      return 'AI response error';
-    }
+      if (!res.data?.response) {
+        console.error('❌ INVALID OLLAMA RESPONSE', res.data);
+        return 'AI invalid response';
+      }
 
-    let data: any;
-    try {
-      data = await res.json();
-    } catch (jsonErr) {
-      console.error('❌ JSON PARSE ERROR', jsonErr);
-      return 'AI parse error';
+      return res.data.response;
+    } catch (err: any) {
+      console.error('❌ AI ERROR', err?.message || err);
+      return 'AI internal error';
     }
-
-    if (!data?.response) {
-      console.error('❌ INVALID OLLAMA PAYLOAD', data);
-      return 'AI invalid response';
-    }
-
-    return data.response;
   }
 }

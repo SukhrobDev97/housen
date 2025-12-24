@@ -1,7 +1,7 @@
 import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { AiService } from './ai.service';
 
-@Controller('api')
+@Controller()
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 
