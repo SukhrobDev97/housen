@@ -1,7 +1,8 @@
 import {
   WebSocketGateway,
-  SubscribeMessage,
   OnGatewayInit,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
@@ -15,6 +16,7 @@ interface MessagePayload {
   event: string;
   text: string;
   memberData?: Member | null;
+  senderId: string | null;
 }
 
 interface InfoPayload {
@@ -26,7 +28,7 @@ interface InfoPayload {
 
 @WebSocketGateway({ transports: ['websocket'], secure: false })
 export class SocketGateway
-  implements OnGatewayInit  {
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger: Logger = new Logger('SocketGateway');
   private summaryClient : number= 0;
   private clientsAuthMap = new Map<WebSocket, Member | null>();
@@ -68,6 +70,38 @@ export class SocketGateway
     };
     this.emitMsg(infoMsg)
     client.send(JSON.stringify({event: 'getMessages', list: this.messageList}));
+
+    client.on('message', (data: WebSocket.Data) => {
+      try {
+        const messageText = data.toString();
+
+        if (!messageText || messageText.trim().length === 0) {
+          return;
+        }
+
+        const authMember = this.clientsAuthMap.get(client);
+
+        const newMessage: MessagePayload = {
+          event: 'message',
+          text: messageText.trim(),
+          memberData: authMember,
+          senderId: authMember?._id ? String(authMember._id) : null,
+        };
+
+        const clientNick: string = authMember?.memberNick ?? 'Guest';
+        this.logger.verbose(`New message [${clientNick}]: ${messageText}`);
+
+        this.messageList.push(newMessage);
+
+        if (this.messageList.length > 5) {
+          this.messageList.splice(0, this.messageList.length - 5);
+        }
+
+        this.emitMsg(newMessage);
+      } catch (error) {
+        this.logger.error('Error handling message:', error);
+      }
+    });
   }
 
   public handleDisconnect(client: WebSocket) {
@@ -89,22 +123,6 @@ export class SocketGateway
     this.broadcastMsg(client, infoMsg);
   }
 
-  @SubscribeMessage('message')
-  public async handleMessage(client: WebSocket, payload: string):Promise<void> {
-    const authMember = this.clientsAuthMap.get(client);
-    const newMessage: MessagePayload = {
-      event: 'message',
-      text: payload,
-      memberData: authMember,
-    }
-    const clientNick: string = authMember ?.memberNick ?? 'Guest';
-    this.logger.verbose(`New message [${clientNick}]: ${payload}`);
-    this.messageList.push(newMessage);
-    if(this.messageList.length > 5) this.messageList.splice(0, this.messageList.length - 5);
-    
-    this.emitMsg(newMessage);
-
-  }
 
   private broadcastMsg (sender: WebSocket, message: InfoPayload | MessagePayload) {
     this.server.clients.forEach((client) => {

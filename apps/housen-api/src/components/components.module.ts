@@ -8,9 +8,11 @@ import { ViewModule } from './view/view.module';
 import { FollowModule } from './follow/follow.module';
 import { CommunityModule } from './community/community.module';
 import { BoardArticleModule } from './board-article/board-article.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
+    AiModule,
     MemberModule,
     ProjectModule, 
     AuthModule, 

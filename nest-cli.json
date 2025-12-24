@@ -16,6 +16,7 @@
       "entryFile": "main",
       "sourceRoot": "apps/housen-api/src",
       "compilerOptions": {
+        "webpack": false,
         "tsConfigPath": "apps/housen-api/tsconfig.app.json"
       }
     },

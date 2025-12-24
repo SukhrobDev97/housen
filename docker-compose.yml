@@ -2,14 +2,15 @@ version: '3.3'
 
 services:
   housen-api:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     container_name: housen-api
     restart: always
     image: node:20.10.0
     ports:
       - 4000:3005
-    environment:
-      - PORT_API=3005
-      - OPENAI_API_KEY: ${OPENAI_API_KEY}
+    env_file:
+      - .env
     volumes:
       - ./:/usr/src/housen
     working_dir: /usr/src/housen

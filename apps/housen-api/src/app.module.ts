@@ -13,7 +13,7 @@ import { AiModule } from './components/ai/ai.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(), 
+    ConfigModule.forRoot({isGlobal: true}), 
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       playground: true,

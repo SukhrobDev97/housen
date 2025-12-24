@@ -64,7 +64,32 @@ export class ProjectResolver {
             @Args('input') input: ProjectsInquiry,
             @AuthMember('_id') memberId: ObjectId,
       ): Promise<Projects> {
-            console.log('Query: getProperties');
+            // CRITICAL DEBUG: Resolver chaqirilganini tekshirish
+            console.error('🔴 RESOLVER: getProjects CALLED');
+            console.error('🔴 RESOLVER: Full input:', JSON.stringify(input, null, 2));
+            console.log('=== RESOLVER: getProjects ===');
+            console.log('Full input:', JSON.stringify(input, null, 2));
+            console.log('input.search:', JSON.stringify(input.search, null, 2));
+            console.log('projectStyleList:', {
+              value: input.search?.projectStyleList,
+              type: typeof input.search?.projectStyleList,
+              isArray: Array.isArray(input.search?.projectStyleList),
+              length: input.search?.projectStyleList?.length,
+              stringified: JSON.stringify(input.search?.projectStyleList),
+            });
+            
+            // Agar projectStyleList mavjud bo'lsa, har bir elementni tekshirish
+            if (input.search?.projectStyleList) {
+              console.log('projectStyleList elements:');
+              input.search.projectStyleList.forEach((style, index) => {
+                console.log(`  [${index}]:`, {
+                  value: style,
+                  type: typeof style,
+                  stringified: JSON.stringify(style),
+                });
+              });
+            }
+            
             return await this.projectService.getProjects(memberId, input);
       }
 

@@ -8,6 +8,7 @@ import { WsAdapter } from '@nestjs/platform-ws';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({
     transform: true,              // Auto-transform payloads to DTO instances
     whitelist: true,              // Strip properties without decorators
@@ -23,7 +24,9 @@ async function bootstrap() {
 
   app.use(graphqlUploadExpress({maxFileSize: 15000000, maxFiles: 10}))
   app.use("/uploads", express.static("./uploads"))
-  app.useWebSocketAdapter(new WsAdapter(app))
+  // app.useWebSocketAdapter(new WsAdapter(app))
   await app.listen(process.env.PORT_API ?? 3000);
+  
+
 }
 bootstrap();
