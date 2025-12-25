@@ -47,7 +47,6 @@ export class SocketGateway
     try{ 
       const parsedUrl = url.parse(req.url, true);
       const {token} = parsedUrl.query
-      console.log('Token:', token);
       return await this.authService.verifyToken(token as string);
     }catch(err){
       return null;
@@ -87,9 +86,6 @@ export class SocketGateway
           memberData: authMember,
           senderId: authMember?._id ? String(authMember._id) : null,
         };
-
-        const clientNick: string = authMember?.memberNick ?? 'Guest';
-        this.logger.verbose(`New message [${clientNick}]: ${messageText}`);
 
         this.messageList.push(newMessage);
 

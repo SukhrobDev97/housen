@@ -21,13 +21,11 @@ export class AiService {
       );
 
       if (!res.data?.response) {
-        console.error('❌ INVALID OLLAMA RESPONSE', res.data);
         return 'AI invalid response';
       }
 
       return res.data.response;
     } catch (err: any) {
-      console.error('❌ AI ERROR', err?.message || err);
       return 'AI internal error';
     }
   }
