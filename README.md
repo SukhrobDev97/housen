@@ -1,98 +1,201 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Housen
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**Full-stack real-estate and project discovery platform with community features, ranking, realtime capabilities, and AI assistance.**
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Housen is a property-focused platform where users can discover projects, interact with agencies and members, save favorites, participate in the community, and explore ranked real-estate content. The backend is built as a NestJS monorepo with a GraphQL API and a separate batch application for background ranking jobs.
 
-## Description
+The frontend lives in a separate repository: [`SukhrobDev97/housen-client`](https://github.com/SukhrobDev97/housen-client).
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Core features
 
-## Project setup
+- **Project discovery** — browse and filter projects by type, style, price range, visibility, collaboration options, and text search.
+- **Project details** — project metadata, images, pricing, duration, agency/member information, likes, comments, views, and ranking.
+- **Authentication & members** — JWT-based authentication and member/agency profiles.
+- **Favorites & likes** — users can like projects and retrieve saved/favorite projects.
+- **Community** — board articles, comments, likes, and member interactions.
+- **Social interactions** — follow relationships, views, and engagement statistics.
+- **Realtime layer** — WebSocket support through NestJS socket modules.
+- **AI endpoint** — local AI integration backed by Ollama; the model and Ollama URL are configurable through environment variables.
+- **Ranking jobs** — a separate batch application recalculates project and agency ranking scores from engagement signals.
 
-```bash
-$ npm install
+## Architecture
+
+```text
+Next.js client
+    |
+    | Apollo Client / GraphQL
+    v
+NestJS GraphQL API
+    |
+    +-- Auth / Members
+    +-- Projects
+    +-- Likes / Favorites / Views
+    +-- Community / Articles / Comments
+    +-- Follow relationships
+    +-- WebSocket layer
+    +-- AI service ---> Ollama
+    |
+    v
+MongoDB / Mongoose
+
+Separate NestJS batch app
+    |
+    +-- Project ranking jobs
+    +-- Agency ranking jobs
 ```
 
-## Compile and run the project
+## Backend structure
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```text
+apps/
+├── housen-api/
+│   └── src/
+│       ├── components/
+│       │   ├── ai/
+│       │   ├── auth/
+│       │   ├── board-article/
+│       │   ├── comment/
+│       │   ├── community/
+│       │   ├── follow/
+│       │   ├── like/
+│       │   ├── member/
+│       │   ├── project/
+│       │   └── view/
+│       ├── database/
+│       ├── libs/
+│       ├── schemas/
+│       └── socket/
+└── housen-batch/
+    └── src/
+        ├── batch.service.ts
+        └── database/
 ```
 
-## Run tests
+## Tech stack
 
-```bash
-# unit tests
-$ npm run test
+| Area | Technologies |
+| --- | --- |
+| Backend | Node.js, TypeScript, NestJS 10 |
+| API | GraphQL, Apollo Server |
+| Database | MongoDB, Mongoose |
+| Authentication | JWT, bcryptjs |
+| Realtime | NestJS WebSockets, Socket.IO / WS |
+| AI | Ollama, configurable local model |
+| Background processing | Separate NestJS batch application |
+| Validation | class-validator, class-transformer |
+| Testing | Jest, Supertest |
+| Infrastructure | Docker Compose |
+| Frontend | Next.js 14, React 18, Apollo Client, MUI |
 
-# e2e tests
-$ npm run test:e2e
+## Engineering highlights
 
-# test coverage
-$ npm run test:cov
+### Flexible project search
+
+Project queries are built dynamically and support multiple filters while preserving pagination and sorting. The API can filter by project style, project type, price range, member/agency, collaboration/public options, and title search.
+
+### Engagement-aware ranking
+
+The batch application calculates ranking scores from real user activity instead of storing a fixed manual order.
+
+For projects, engagement such as likes and views contributes to ranking. Agencies are ranked from a combination of projects, articles, likes, and views.
+
+### Engagement tracking
+
+Views and likes are integrated into project retrieval so the API can expose user-specific state such as whether the authenticated member has already liked a project.
+
+### Local AI integration
+
+Housen includes an AI service that sends prompts to an Ollama instance. The integration defaults to a local model and can be configured through:
+
+```env
+OLLAMA_URL=http://ollama:11434
+OLLAMA_MODEL=mistral:latest
 ```
 
-## Deployment
+This keeps the AI layer independently configurable from the core real-estate domain.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Frontend
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+The client application is maintained separately in [`housen-client`](https://github.com/SukhrobDev97/housen-client) and uses:
+
+- Next.js 14
+- React 18
+- Apollo Client
+- Material UI
+- i18n
+- Three.js / React Three Fiber
+- WebSocket subscriptions
+
+The UI includes property/project pages, member and account flows, community sections, admin pages, personal dashboard areas, and an agent/AI-facing section.
+
+## Local development
+
+### Requirements
+
+- Node.js 20+
+- MongoDB
+- npm
+- Docker / Docker Compose if running the containerized services
+
+### Install
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Create a `.env` file and configure the database connection used by the application:
 
-## Resources
+```env
+MONGO_DEV=mongodb://localhost:27017/housen
+MONGO_PROD=your-production-mongodb-uri
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Add the authentication and other environment values required by your deployment.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Run the API
 
-## Support
+```bash
+npm run start:dev
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Run the batch application
 
-## Stay in touch
+```bash
+npm run start:dev:batch
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Build
 
-## License
+```bash
+npm run build
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Tests
+
+```bash
+npm test
+npm run test:cov
+npm run test:e2e
+```
+
+## Docker
+
+The repository includes Docker Compose services for:
+
+- `housen-api`
+- `housen-batch`
+- `ollama`
+
+```bash
+docker compose up
+```
+
+The current compose configuration exposes the API and batch application separately and keeps Ollama on the shared internal network.
+
+## Related repository
+
+Frontend: [`SukhrobDev97/housen-client`](https://github.com/SukhrobDev97/housen-client)
+
+---
+
+Housen is a portfolio project demonstrating full-stack product development, GraphQL API design, MongoDB aggregation, realtime features, background jobs, engagement-based ranking, and local AI integration.
